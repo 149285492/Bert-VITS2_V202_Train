@@ -58,22 +58,23 @@ if __name__ == "__main__":
     speaker_names = list(os.walk(parent_dir))[0][1]   
     args = parser.parse_args()
    
-    entered = False
-    while not entered:
-      print("Enter a letter to choose language.\n")
-      print("C = Chinese ; J = Japanese ;E = English;\n e.g: C \n")
-      languages=input("Enter language: ")
-      if (languages == "C"or languages == "c"):
-        lang='ZH'
-        entered = True
-      elif (languages == "J"or languages == "j"):
-        lang='JP'
-        entered = True
-      elif (languages == "E"or languages == "e"):
-        lang='EN'
-        entered = True
-      else:
-        print("Illegal Arguments! Please try again.\n")
+    # entered = False
+    # while not entered:
+      # print("Enter a letter to choose language.\n")
+      # print("C = Chinese ; J = Japanese ;E = English;\n e.g: C \n")
+      # languages=input("Enter language: ")
+      # if (languages == "C"or languages == "c"):
+      #   lang='ZH'
+      #   entered = True
+      # elif (languages == "J"or languages == "j"):
+      #   lang='JP'
+      #   entered = True
+      # elif (languages == "E"or languages == "e"):
+      #   lang='EN'
+      #   entered = True
+      # else:
+      #   print("Illegal Arguments! Please try again.\n")
+    lang = 'ZH'
     # processs = 8
     processs = cpu_count()-2 if cpu_count() >4 else 1
     pool = Pool(processes=processs)
