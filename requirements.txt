@@ -21,6 +21,8 @@ fugashi
 num2words
 PyYAML
 requests
+torchcodec
+torchcrepe
 pyopenjtalk; sys_platform == 'linux'
 openjtalk; sys_platform != 'linux'
 jaconv

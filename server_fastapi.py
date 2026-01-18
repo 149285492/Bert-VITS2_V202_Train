@@ -40,6 +40,7 @@ class Model:
     def __init__(self, config_path: str, model_path: str, device: str, language: str):
         self.config_path: str = os.path.normpath(config_path)
         self.model_path: str = os.path.normpath(model_path)
+        logger.info(f"model_path {self.model_path}")
         self.device: str = device
         self.language: str = language
         self.hps = utils.get_hparams_from_file(config_path)

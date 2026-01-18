@@ -32,10 +32,13 @@
     "mel_fmin": 0.0,
     "mel_fmax": null,
     "add_blank": true,
-    "n_speakers": 1,
+    "n_speakers": 4,
     "cleaned_text": true,
     "spk2id": {
-      "keqing": 0
+      "keqing": 0,
+      "其它语音 - Others": 1,
+      "带变量语音 - Placeholder": 2,
+      "战斗语音 - Battle": 3
     }
   },
   "model": {

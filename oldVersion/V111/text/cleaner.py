@@ -1,9 +1,9 @@
-from . import chinese, japanese, cleaned_text_to_sequence
-from .fix import japanese as japanese_fix
+from . import chinese, cleaned_text_to_sequence
+# from .fix import japanese as japanese_fix
 
 
-language_module_map = {"ZH": chinese, "JP": japanese}
-language_module_map_fix = {"ZH": chinese, "JP": japanese_fix}
+language_module_map = {"ZH": chinese}
+language_module_map_fix = {"ZH": chinese}
 
 
 def clean_text(text, language):

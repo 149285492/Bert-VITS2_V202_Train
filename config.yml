@@ -3,7 +3,7 @@ bert_gen:
   device: cuda
   num_processes: 2
   use_multi_device: false
-dataset_path: Data\keqing
+dataset_path: Data/keqing
 mirror: ''
 openi_token: ''
 preprocess_text:
@@ -25,7 +25,7 @@ server:
   - config: ./Data/keqing/config.json
     device: cuda
     language: ZH
-    model: ./Data/keqing/models/G_0.pth
+    model: ./Data/keqing/models/G_400.pth
     speakers:
     - length_scale: 1
       noise_scale: 0.6
@@ -45,7 +45,7 @@ server:
   - config: ./Data/keqing/config.json
     device: cuda
     language: JP
-    model: ./Data/keqing/models/G_0.pth
+    model: ./Data/keqing/models/G_400.pth
     speakers: []
   port: 7860
 train_ms:
@@ -69,6 +69,6 @@ webui:
   debug: false
   device: cuda
   language_identification_library: langid
-  model: models/G_0.pth
+  model: models/G_400.pth
   port: 7860
   share: false
