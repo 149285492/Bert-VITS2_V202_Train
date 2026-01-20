@@ -40,12 +40,6 @@ pypinyin
 num2words
 pyopenjtalk
 ffmpeg
-libsndfile1-dev
-build-essential
-cmake
-mecab
-libmecab-dev
-mecab-ipadic-utf8
 soundfile
 ffmpeg-python
 pydub
@@ -57,5 +51,5 @@ protobuf==3.20
 tqdm
 rich
 torch==2.9.1
-torchvision==2.9.1
-torchaudio==2.9.1
+torchvision
+torchaudio
