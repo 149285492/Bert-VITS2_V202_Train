@@ -40,12 +40,6 @@ pypinyin
 num2words
 pyopenjtalk
 ffmpeg
-libsndfile1-dev
-build-essential
-cmake
-mecab
-libmecab-dev
-mecab-ipadic-utf8
 soundfile
 ffmpeg-python
 pydub
