@@ -651,15 +651,20 @@ def evaluate(hps, generator, eval_loader, writer_eval):
                     hps.data.mel_fmax,
                 )
                 
-                # 计算评估损失
-                loss = F.l1_loss(mel, y_hat_mel)
+                # 计算评估损失，需要确保两个张量具有相同的尺寸
+                # 调整张量大小以匹配
+                min_length = min(mel.size(-1), y_hat_mel.size(-1))
+                mel_truncated = mel[:, :, :min_length]
+                y_hat_mel_truncated = y_hat_mel[:, :, :min_length]
+                
+                loss = F.l1_loss(mel_truncated, y_hat_mel_truncated)
                 total_loss += loss.item()
                 eval_steps += 1
                 
                 image_dict.update(
                     {
                         f"gen/mel_{batch_idx}": utils.plot_spectrogram_to_numpy(
-                            y_hat_mel[0].cpu().numpy()
+                            y_hat_mel_truncated[0].cpu().numpy()
                         )
                     }
                 )
@@ -673,7 +678,7 @@ def evaluate(hps, generator, eval_loader, writer_eval):
                 image_dict.update(
                     {
                         f"gt/mel_{batch_idx}": utils.plot_spectrogram_to_numpy(
-                            mel[0].cpu().numpy()
+                            mel_truncated[0].cpu().numpy()
                         )
                     }
                 )
