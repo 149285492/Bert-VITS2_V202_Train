@@ -44,6 +44,11 @@ torch.backends.cuda.enable_mem_efficient_sdp(
 )  # Not available if torch version is lower than 2.0
 torch.backends.cuda.enable_math_sdp(True)
 global_step = 0
+# 添加全局变量用于跟踪最佳模型
+best_eval_loss = float('inf')
+best_checkpoint_path_g = ""
+best_checkpoint_path_d = ""
+best_checkpoint_path_dur = ""
 
 
 def run():
@@ -309,6 +314,8 @@ def run():
 def train_and_evaluate(
     rank, epoch, hps, nets, optims, schedulers, scaler, loaders, logger, writers
 ):
+    global global_step, best_eval_loss, best_checkpoint_path_g, best_checkpoint_path_d, best_checkpoint_path_dur
+    
     net_g, net_d, net_dur_disc = nets
     optim_g, optim_d, optim_dur_disc = optims
     scheduler_g, scheduler_d, scheduler_dur_disc = schedulers
@@ -519,35 +526,55 @@ def train_and_evaluate(
                 )
 
             if global_step % hps.train.eval_interval == 0:
-                evaluate(hps, net_g, eval_loader, writer_eval)
+                # 获取验证损失
+                avg_eval_loss = evaluate(hps, net_g, eval_loader, writer_eval)
+                
+                # 保存当前模型
+                current_g_path = os.path.join(hps.model_dir, "G_{}.pth".format(global_step))
+                current_d_path = os.path.join(hps.model_dir, "D_{}.pth".format(global_step))
+                
                 utils.save_checkpoint(
-                    net_g,
-                    optim_g,
-                    hps.train.learning_rate,
-                    epoch,
-                    os.path.join(hps.model_dir, "G_{}.pth".format(global_step)),
+                    net_g, optim_g, hps.train.learning_rate, epoch, current_g_path
                 )
                 utils.save_checkpoint(
-                    net_d,
-                    optim_d,
-                    hps.train.learning_rate,
-                    epoch,
-                    os.path.join(hps.model_dir, "D_{}.pth".format(global_step)),
+                    net_d, optim_d, hps.train.learning_rate, epoch, current_d_path
                 )
+                
+                current_dur_path = None
                 if net_dur_disc is not None:
+                    current_dur_path = os.path.join(hps.model_dir, "DUR_{}.pth".format(global_step))
                     utils.save_checkpoint(
-                        net_dur_disc,
-                        optim_dur_disc,
-                        hps.train.learning_rate,
-                        epoch,
-                        os.path.join(hps.model_dir, "DUR_{}.pth".format(global_step)),
+                        net_dur_disc, optim_dur_disc, hps.train.learning_rate, epoch, current_dur_path
                     )
+                
+                # 检查是否是最佳模型
+                if avg_eval_loss < best_eval_loss:
+                    logger.info(f"新的最佳验证损失: {avg_eval_loss:.4f} (之前: {best_eval_loss:.4f})")
+                    best_eval_loss = avg_eval_loss
+                    
+                    # 删除旧的最佳模型文件
+                    if best_checkpoint_path_g and os.path.exists(best_checkpoint_path_g):
+                        os.remove(best_checkpoint_path_g)
+                    if best_checkpoint_path_d and os.path.exists(best_checkpoint_path_d):
+                        os.remove(best_checkpoint_path_d)
+                    if best_checkpoint_path_dur and os.path.exists(best_checkpoint_path_dur):
+                        os.remove(best_checkpoint_path_dur)
+                    
+                    # 更新最佳模型路径
+                    best_checkpoint_path_g = current_g_path
+                    best_checkpoint_path_d = current_d_path
+                    best_checkpoint_path_dur = current_dur_path
+                    
+                    logger.info(f"保存新的最佳模型: {best_checkpoint_path_g}")
+
+                # 清理其他检查点，保留最佳模型和最近的几个
                 keep_ckpts = getattr(hps.train, "keep_ckpts", 5)
                 if keep_ckpts > 0:
                     utils.clean_checkpoints(
                         path_to_models=hps.model_dir,
                         n_ckpts_to_keep=keep_ckpts,
                         sort_by_time=True,
+                        exclude_paths=[best_checkpoint_path_g, best_checkpoint_path_d, best_checkpoint_path_dur]
                     )
 
         global_step += 1
@@ -560,6 +587,9 @@ def evaluate(hps, generator, eval_loader, writer_eval):
     generator.eval()
     image_dict = {}
     audio_dict = {}
+    total_loss = 0
+    eval_steps = 0
+    
     print("Evaluating ...")
     with torch.no_grad():
         for batch_idx, (
@@ -585,6 +615,7 @@ def evaluate(hps, generator, eval_loader, writer_eval):
             en_bert = en_bert.cuda()
             tone = tone.cuda()
             language = language.cuda()
+            
             for use_sdp in [True, False]:
                 y_hat, attn, mask, *_ = generator.module.infer(
                     x,
@@ -619,6 +650,12 @@ def evaluate(hps, generator, eval_loader, writer_eval):
                     hps.data.mel_fmin,
                     hps.data.mel_fmax,
                 )
+                
+                # 计算评估损失
+                loss = F.l1_loss(mel, y_hat_mel)
+                total_loss += loss.item()
+                eval_steps += 1
+                
                 image_dict.update(
                     {
                         f"gen/mel_{batch_idx}": utils.plot_spectrogram_to_numpy(
@@ -649,7 +686,10 @@ def evaluate(hps, generator, eval_loader, writer_eval):
         audios=audio_dict,
         audio_sampling_rate=hps.data.sampling_rate,
     )
+    
+    avg_eval_loss = total_loss / eval_steps if eval_steps > 0 else float('inf')
     generator.train()
+    return avg_eval_loss
 
 
 if __name__ == "__main__":
