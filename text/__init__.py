@@ -23,6 +23,9 @@ def get_bert(norm_text, word2ph, language, device):
     from .english_bert_mock import get_bert_feature as en_bert
     # from .japanese_bert import get_bert_feature as jp_bert
 
+    # 为日语语言代码返回中文BERT特征
+    if language == "JP":
+        language = "ZH"  # 将日语请求重定向到中文处理
     lang_bert_func_map = {"ZH": zh_bert, "EN": en_bert}
     bert = lang_bert_func_map[language](norm_text, word2ph, device)
     return bert

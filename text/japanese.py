@@ -9,37 +9,42 @@ from text import punctuation, symbols
 
 from num2words import num2words
 
-import pyopenjtalk
-import jaconv
+# import pyopenjtalk  # 注释掉pyopenjtalk导入
+# import jaconv       # 注释掉jaconv导入
 
 
 def kata2phoneme(text: str) -> str:
     """Convert katakana text to phonemes."""
-    text = text.strip()
-    if text == "ー":
-        return ["ー"]
-    elif text.startswith("ー"):
-        return ["ー"] + kata2phoneme(text[1:])
-    res = []
-    prev = None
-    while text:
-        if re.match(_MARKS, text):
-            res.append(text)
-            text = text[1:]
-            continue
-        if text.startswith("ー"):
-            if prev:
-                res.append(prev[-1])
-            text = text[1:]
-            continue
-        res += pyopenjtalk.g2p(text).lower().replace("cl", "q").split(" ")
-        break
-    # res = _COLON_RX.sub(":", res)
-    return res
+    # 注释掉日语支持功能
+    # text = text.strip()
+    # if text == "ー":
+    #     return ["ー"]
+    # elif text.startswith("ー"):
+    #     return ["ー"] + kata2phoneme(text[1:])
+    # res = []
+    # prev = None
+    # while text:
+    #     if re.match(_MARKS, text):
+    #         res.append(text)
+    #         text = text[1:]
+    #         continue
+    #     if text.startswith("ー"):
+    #         if prev:
+    #             res.append(prev[-1])
+    #         text = text[1:]
+    #         continue
+    #     res += pyopenjtalk.g2p(text).lower().replace("cl", "q").split(" ")
+    #     break
+    # # res = _COLON_RX.sub(":", res)
+    # return res
+    # 替换为简单的占位符函数
+    return []
 
 
 def hira2kata(text: str) -> str:
-    return jaconv.hira2kata(text)
+    # return jaconv.hira2kata(text)
+    # 替换为简单的占位符函数
+    return text
 
 
 _SYMBOL_TOKENS = set(list("・、。？！"))
@@ -50,97 +55,103 @@ _MARKS = re.compile(
 
 
 def text2kata(text: str) -> str:
-    parsed = pyopenjtalk.run_frontend(text)
-
-    res = []
-    for parts in parsed:
-        word, yomi = replace_punctuation(parts["string"]), parts["pron"].replace(
-            "’", ""
-        )
-        if yomi:
-            if re.match(_MARKS, yomi):
-                if len(word) > 1:
-                    word = [replace_punctuation(i) for i in list(word)]
-                    yomi = word
-                    res += yomi
-                    sep += word
-                    continue
-                elif word not in rep_map.keys() and word not in rep_map.values():
-                    word = ","
-                yomi = word
-            res.append(yomi)
-        else:
-            if word in _SYMBOL_TOKENS:
-                res.append(word)
-            elif word in ("っ", "ッ"):
-                res.append("ッ")
-            elif word in _NO_YOMI_TOKENS:
-                pass
-            else:
-                res.append(word)
-    return hira2kata("".join(res))
+    # parsed = pyopenjtalk.run_frontend(text)
+    #
+    # res = []
+    # for parts in parsed:
+    #     word, yomi = replace_punctuation(parts["string"]), parts["pron"].replace(
+    #         "’", ""
+    #     )
+    #     if yomi:
+    #         if re.match(_MARKS, yomi):
+    #             if len(word) > 1:
+    #                 word = [replace_punctuation(i) for i in list(word)]
+    #                 yomi = word
+    #                 res += yomi
+    #                 sep += word
+    #                 continue
+    #             elif word not in rep_map.keys() and word not in rep_map.values():
+    #                 word = ","
+    #             yomi = word
+    #         res.append(yomi)
+    #     else:
+    #         if word in _SYMBOL_TOKENS:
+    #             res.append(word)
+    #         elif word in ("っ", "ッ"):
+    #             res.append("ッ")
+    #         elif word in _NO_YOMI_TOKENS:
+    #             pass
+    #         else:
+    #             res.append(word)
+    # return hira2kata("".join(res))
+    # 替换为简单的占位符函数
+    return text
 
 
 def text2sep_kata(text: str) -> (list, list):
-    parsed = pyopenjtalk.run_frontend(text)
-
-    res = []
-    sep = []
-    for parts in parsed:
-        word, yomi = replace_punctuation(parts["string"]), parts["pron"].replace(
-            "’", ""
-        )
-        if yomi:
-            if re.match(_MARKS, yomi):
-                if len(word) > 1:
-                    word = [replace_punctuation(i) for i in list(word)]
-                    yomi = word
-                    res += yomi
-                    sep += word
-                    continue
-                elif word not in rep_map.keys() and word not in rep_map.values():
-                    word = ","
-                yomi = word
-            res.append(yomi)
-        else:
-            if word in _SYMBOL_TOKENS:
-                res.append(word)
-            elif word in ("っ", "ッ"):
-                res.append("ッ")
-            elif word in _NO_YOMI_TOKENS:
-                pass
-            else:
-                res.append(word)
-        sep.append(word)
-    return sep, [hira2kata(i) for i in res], get_accent(parsed)
+    # parsed = pyopenjtalk.run_frontend(text)
+    #
+    # res = []
+    # sep = []
+    # for parts in parsed:
+    #     word, yomi = replace_punctuation(parts["string"]), parts["pron"].replace(
+    #         "’", ""
+    #     )
+    #     if yomi:
+    #         if re.match(_MARKS, yomi):
+    #             if len(word) > 1:
+    #                 word = [replace_punctuation(i) for i in list(word)]
+    #                 yomi = word
+    #                 res += yomi
+    #                 sep += word
+    #                 continue
+    #             elif word not in rep_map.keys() and word not in rep_map.values():
+    #                 word = ","
+    #             yomi = word
+    #         res.append(yomi)
+    #     else:
+    #         if word in _SYMBOL_TOKENS:
+    #             res.append(word)
+    #         elif word in ("っ", "ッ"):
+    #             res.append("ッ")
+    #         elif word in _NO_YOMI_TOKENS:
+    #             pass
+    #         else:
+    #             res.append(word)
+    #     sep.append(word)
+    # return sep, [hira2kata(i) for i in res], get_accent(parsed)
+    # 替换为简单的占位符函数
+    return [], [], []
 
 
 def get_accent(parsed):
-    labels = pyopenjtalk.make_label(parsed)
-
-    phonemes = []
-    accents = []
-    for n, label in enumerate(labels):
-        phoneme = re.search(r"\-([^\+]*)\+", label).group(1)
-        if phoneme not in ["sil", "pau"]:
-            phonemes.append(phoneme.replace("cl", "q").lower())
-        else:
-            continue
-        a1 = int(re.search(r"/A:(\-?[0-9]+)\+", label).group(1))
-        a2 = int(re.search(r"\+(\d+)\+", label).group(1))
-        if re.search(r"\-([^\+]*)\+", labels[n + 1]).group(1) in ["sil", "pau"]:
-            a2_next = -1
-        else:
-            a2_next = int(re.search(r"\+(\d+)\+", labels[n + 1]).group(1))
-        # Falling
-        if a1 == 0 and a2_next == a2 + 1:
-            accents.append(-1)
-        # Rising
-        elif a2 == 1 and a2_next == 2:
-            accents.append(1)
-        else:
-            accents.append(0)
-    return list(zip(phonemes, accents))
+    # labels = pyopenjtalk.make_label(parsed)
+    #
+    # phonemes = []
+    # accents = []
+    # for n, label in enumerate(labels):
+    #     phoneme = re.search(r"\-([^\+]*)\+", label).group(1)
+    #     if phoneme not in ["sil", "pau"]:
+    #         phonemes.append(phoneme.replace("cl", "q").lower())
+    #     else:
+    #         continue
+    #     a1 = int(re.search(r"/A:(\-?[0-9]+)\+", label).group(1))
+    #     a2 = int(re.search(r"\+(\d+)\+", label).group(1))
+    #     if re.search(r"\-([^\+]*)\+", labels[n + 1]).group(1) in ["sil", "pau"]:
+    #         a2_next = -1
+    #     else:
+    #         a2_next = int(re.search(r"\+(\d+)\+", labels[n + 1]).group(1))
+    #     # Falling
+    #     if a1 == 0 and a2_next == a2 + 1:
+    #         accents.append(-1)
+    #     # Rising
+    #     elif a2 == 1 and a2_next == 2:
+    #         accents.append(1)
+    #     else:
+    #         accents.append(0)
+    # return list(zip(phonemes, accents))
+    # 替换为简单的占位符函数
+    return []
 
 
 _ALPHASYMBOL_YOMI = {
@@ -215,24 +226,30 @@ _NUMBER_RX = re.compile(r"[0-9]+(\.[0-9]+)?")
 
 
 def japanese_convert_numbers_to_words(text: str) -> str:
-    res = _NUMBER_WITH_SEPARATOR_RX.sub(lambda m: m[0].replace(",", ""), text)
-    res = _CURRENCY_RX.sub(lambda m: m[2] + _CURRENCY_MAP.get(m[1], m[1]), res)
-    res = _NUMBER_RX.sub(lambda m: num2words(m[0], lang="ja"), res)
-    return res
+    # res = _NUMBER_WITH_SEPARATOR_RX.sub(lambda m: m[0].replace(",", ""), text)
+    # res = _CURRENCY_RX.sub(lambda m: m[2] + _CURRENCY_MAP.get(m[1], m[1]), res)
+    # res = _NUMBER_RX.sub(lambda m: num2words(m[0], lang="ja"), res)
+    # return res
+    # 替换为简单的占位符函数
+    return text
 
 
 def japanese_convert_alpha_symbols_to_words(text: str) -> str:
-    return "".join([_ALPHASYMBOL_YOMI.get(ch, ch) for ch in text.lower()])
+    # return "".join([_ALPHASYMBOL_YOMI.get(ch, ch) for ch in text.lower()])
+    # 替换为简单的占位符函数
+    return text
 
 
 def japanese_text_to_phonemes(text: str) -> str:
     """Convert Japanese text to phonemes."""
-    res = unicodedata.normalize("NFKC", text)
-    res = japanese_convert_numbers_to_words(res)
-    # res = japanese_convert_alpha_symbols_to_words(res)
-    res = text2kata(res)
-    res = kata2phoneme(res)
-    return res
+    # res = unicodedata.normalize("NFKC", text)
+    # res = japanese_convert_numbers_to_words(res)
+    # # res = japanese_convert_alpha_symbols_to_words(res)
+    # res = text2kata(res)
+    # res = kata2phoneme(res)
+    # return res
+    # 替换为简单的占位符函数
+    return text
 
 
 def is_japanese_character(char):
@@ -314,8 +331,8 @@ def replace_punctuation(text):
 
 def text_normalize(text):
     res = unicodedata.normalize("NFKC", text)
-    res = japanese_convert_numbers_to_words(res)
-    # res = "".join([i for i in res if is_japanese_character(i)])
+    # res = japanese_convert_numbers_to_words(res)
+    # # res = "".join([i for i in res if is_japanese_character(i)])
     res = replace_punctuation(res)
     return res
 
@@ -340,64 +357,68 @@ def handle_long(sep_phonemes):
     return sep_phonemes
 
 
-tokenizer = AutoTokenizer.from_pretrained("./bert/deberta-v2-large-japanese")
+# tokenizer = AutoTokenizer.from_pretrained("./bert/deberta-v2-large-japanese")
 
 
 def align_tones(phones, tones):
-    res = []
-    for pho in phones:
-        temp = [0] * len(pho)
-        for idx, p in enumerate(pho):
-            if len(tones) == 0:
-                break
-            if p == tones[0][0]:
-                temp[idx] = tones[0][1]
-                if idx > 0:
-                    temp[idx] += temp[idx - 1]
-                tones.pop(0)
-        temp = [0] + temp
-        temp = temp[:-1]
-        if -1 in temp:
-            temp = [i + 1 for i in temp]
-        res.append(temp)
-    res = [i for j in res for i in j]
-    assert not any([i < 0 for i in res]) and not any([i > 1 for i in res])
-    return res
+    # res = []
+    # for pho in phones:
+    #     temp = [0] * len(pho)
+    #     for idx, p in enumerate(pho):
+    #         if len(tones) == 0:
+    #             break
+    #         if p == tones[0][0]:
+    #             temp[idx] = tones[0][1]
+    #             if idx > 0:
+    #                 temp[idx] += temp[idx - 1]
+    #             tones.pop(0)
+    #     temp = [0] + temp
+    #     temp = temp[:-1]
+    #     if -1 in temp:
+    #         temp = [i + 1 for i in temp]
+    #     res.append(temp)
+    # res = [i for j in res for i in j]
+    # assert not any([i < 0 for i in res]) and not any([i > 1 for i in res])
+    # return res
+    # 替换为简单的占位符函数
+    return []
 
 
 def g2p(norm_text):
-    sep_text, sep_kata, acc = text2sep_kata(norm_text)
-    sep_tokenized = [tokenizer.tokenize(i) for i in sep_text]
-    sep_phonemes = handle_long([kata2phoneme(i) for i in sep_kata])
-    # 异常处理，MeCab不认识的词的话会一路传到这里来，然后炸掉。目前来看只有那些超级稀有的生僻词会出现这种情况
-    for i in sep_phonemes:
-        for j in i:
-            assert j in symbols, (sep_text, sep_kata, sep_phonemes)
-    tones = align_tones(sep_phonemes, acc)
-
-    word2ph = []
-    for token, phoneme in zip(sep_tokenized, sep_phonemes):
-        phone_len = len(phoneme)
-        word_len = len(token)
-
-        aaa = distribute_phone(phone_len, word_len)
-        word2ph += aaa
-    phones = ["_"] + [j for i in sep_phonemes for j in i] + ["_"]
-    tones = [0] + tones + [0]
-    word2ph = [1] + word2ph + [1]
-    assert len(phones) == len(tones)
-    return phones, tones, word2ph
+    # sep_text, sep_kata, acc = text2sep_kata(norm_text)
+    # sep_tokenized = [tokenizer.tokenize(i) for i in sep_text]
+    # sep_phonemes = handle_long([kata2phoneme(i) for i in sep_kata])
+    # # 异常处理，MeCab不认识的词的话会一路传到这里来，然后炸掉。目前来看只有那些超级稀有的生僻词会出现这种情况
+    # for i in sep_phonemes:
+    #     for j in i:
+    #         assert j in symbols, (sep_text, sep_kata, sep_phonemes)
+    # tones = align_tones(sep_phonemes, acc)
+    #
+    # word2ph = []
+    # for token, phoneme in zip(sep_tokenized, sep_phonemes):
+    #     phone_len = len(phoneme)
+    #     word_len = len(token)
+    #
+    #     aaa = distribute_phone(phone_len, word_len)
+    #     word2ph += aaa
+    # phones = ["_"] + [j for i in sep_phonemes for j in i] + ["_"]
+    # tones = [0] + tones + [0]
+    # word2ph = [1] + word2ph + [1]
+    # assert len(phones) == len(tones)
+    # return phones, tones, word2ph
+    # 替换为简单的占位符函数
+    return ["_","_"], [0,0], [1,1]
 
 
 if __name__ == "__main__":
-    tokenizer = AutoTokenizer.from_pretrained("./bert/deberta-v2-large-japanese")
+    # tokenizer = AutoTokenizer.from_pretrained("./bert/deberta-v2-large-japanese")
     text = "hello,こんにちは、世界ー！……"
-    from text.japanese_bert import get_bert_feature
+    # from text.japanese_bert import get_bert_feature
 
     text = text_normalize(text)
     print(text)
 
     phones, tones, word2ph = g2p(text)
-    bert = get_bert_feature(text, word2ph)
+    # bert = get_bert_feature(text, word2ph)
 
-    print(phones, tones, word2ph, bert.shape)
+    print(phones, tones, word2ph) #, bert.shape)

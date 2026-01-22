@@ -524,8 +524,10 @@ def train_and_evaluate(
                 )
 
             if global_step % hps.train.eval_interval == 0:
+                logger.info(f"到达评估间隔: {global_step}, 开始评估...")
                 # 获取验证损失
                 avg_eval_loss = evaluate(hps, net_g, eval_loader, writer_eval)
+                logger.info(f"当前验证损失: {avg_eval_loss:.4f}, 最佳验证损失: {best_eval_loss:.4f}")
                 
                 # 保存当前模型（保持原有流程）
                 utils.save_checkpoint(
@@ -571,6 +573,8 @@ def train_and_evaluate(
                     if net_dur_disc is not None:
                         logger.info(f"保存新的最佳持续时间判别器模型: DUR_best.pth")
                     best_model_saved = True
+                else:
+                    logger.info(f"当前模型不是最佳模型，跳过最佳模型保存")
                 
                 # 保持原有的检查点清理流程
                 keep_ckpts = getattr(hps.train, "keep_ckpts", 5)
