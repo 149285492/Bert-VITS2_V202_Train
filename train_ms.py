@@ -568,14 +568,10 @@ def train_and_evaluate(
                     logger.info(f"保存新的最佳模型: {best_checkpoint_path_g}")
 
                 # 清理其他检查点，保留最佳模型和最近的几个
+                # 由于clean_checkpoints函数不支持exclude_paths参数，我们需要手动实现
                 keep_ckpts = getattr(hps.train, "keep_ckpts", 5)
                 if keep_ckpts > 0:
-                    utils.clean_checkpoints(
-                        path_to_models=hps.model_dir,
-                        n_ckpts_to_keep=keep_ckpts,
-                        sort_by_time=True,
-                        exclude_paths=[best_checkpoint_path_g, best_checkpoint_path_d, best_checkpoint_path_dur]
-                    )
+                    cleanup_old_checkpoints(hps.model_dir, keep_ckpts, best_checkpoint_path_g, best_checkpoint_path_d, best_checkpoint_path_dur)
 
         global_step += 1
 
@@ -695,6 +691,62 @@ def evaluate(hps, generator, eval_loader, writer_eval):
     avg_eval_loss = total_loss / eval_steps if eval_steps > 0 else float('inf')
     generator.train()
     return avg_eval_loss
+
+
+def cleanup_old_checkpoints(model_dir, keep_ckpts, best_g_path, best_d_path, best_dur_path):
+    """
+    手动清理旧的检查点，保留指定数量的最新检查点和最佳模型
+    """
+    import re
+    import os
+    from pathlib import Path
+
+    # 获取所有G_*.pth, D_*.pth, DUR_*.pth文件
+    g_files = []
+    d_files = []
+    dur_files = []
+
+    for file in os.listdir(model_dir):
+        full_path = os.path.join(model_dir, file)
+        if os.path.isfile(full_path):
+            if re.match(r'G_\d+\.pth', file):
+                g_files.append(full_path)
+            elif re.match(r'D_\d+\.pth', file):
+                d_files.append(full_path)
+            elif re.match(r'DUR_\d+\.pth', file):
+                dur_files.append(full_path)
+
+    # 按时间排序（最新的在前）
+    g_files.sort(key=lambda x: os.path.getmtime(x), reverse=True)
+    d_files.sort(key=lambda x: os.path.getmtime(x), reverse=True)
+    dur_files.sort(key=lambda x: os.path.getmtime(x), reverse=True)
+
+    # 定义保留的文件集合
+    files_to_keep = set()
+    if best_g_path:
+        files_to_keep.add(best_g_path)
+    if best_d_path:
+        files_to_keep.add(best_d_path)
+    if best_dur_path:
+        files_to_keep.add(best_dur_path)
+
+    # 添加最新的N个检查点到保留列表
+    for file_list in [g_files, d_files, dur_files]:
+        kept_count = 0
+        for file_path in file_list:
+            if file_path not in files_to_keep and kept_count < keep_ckpts:
+                files_to_keep.add(file_path)
+                kept_count += 1
+
+    # 删除不在保留列表中的文件
+    for file_list in [g_files, d_files, dur_files]:
+        for file_path in file_list:
+            if file_path not in files_to_keep:
+                try:
+                    os.remove(file_path)
+                    print(f"已删除旧检查点: {file_path}")
+                except OSError as e:
+                    print(f"删除文件失败 {file_path}: {e}")
 
 
 if __name__ == "__main__":
